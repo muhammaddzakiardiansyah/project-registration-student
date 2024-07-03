@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+:root {
+    --color-primary: #4ED151;
+    --color-secondary: #257F27;
+    --color-white: #EDF7ED ;
+    --color-dark: #184F1A;
+    --font-primary: "Open Sans", sans-serif;
+}
+
+.font-primary {
+    font-family: var(--font-primary);
+}
+
+.bg-sc-primary {
+    background-color: var(--color-primary);
+}
+
+.bg-sc-secondary {
+    background-color: var(--color-secondary);
+}
+
+.text-primary {
+    color: var(--color-primary);
+}
+
+.text-secondary {
+    color: var(--color-secondary);
+}
+
+.text-white {
+    color: var(--color-white);
+}
+
+.section {
+    margin-top: 15%;
+}
+
+.section .section-text {
+    margin-top: 10%;
+}
+
+.fs-sc-large {
+    font-size: 3em;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.nav-item {
+    font-weight: 600;
+    margin: 0 15px;
+    transition: all .3s ease;
+    -webkit-transition: all .3s ease;
+    -moz-transition: all .3s ease;
+    -ms-transition: all .3s ease;
+    -o-transition: all .3s ease;
+}
+
+.nav-item:hover {
+    scale: 1.1;
+}
+
+.btn-primary {
+    padding: 8px 20px;
+    font-weight: 600;
+    background-color: var(--color-secondary);
+    border: 0;
+    color: var(--color-white);
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    transition: all .3s ease;
+    -webkit-transition: all .3s ease;
+    -moz-transition: all .3s ease;
+    -ms-transition: all .3s ease;
+    -o-transition: all .3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-dark);
+}
+
+.card {
+    box-shadow: 2px 2px 15px rgba(0, 0, 0, .2);
+}
+
+.footer {
+    height: 60px;
+    line-height: 60px;
+}
+
+@media only screen and (max-width: 1000px) {
+    .section .section-text {
+        text-align: center;
+    }
+
+    .section .section-img img {
+        width: 300px;
+        height: 300px;
+        margin-top: 30px;
+    }
+}
+
+@media only screen and (max-width: 460px) {
+    .section .section-text {
+        text-align: center;
+    }
+
+    .section .section-img img {
+        width: 200px;
+        height: 200px;
+        margin-top: 20px;
+    }
+}
