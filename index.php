@@ -1,3 +1,18 @@
+<?php
+session_start();
+
+require './functions.php';
+
+if (isset($_COOKIE['key']) && isset($_COOKIE['id'])) {
+    $dataStudentExits = getDetailStudent($_COOKIE['id']);
+    if ($_COOKIE['key'] === hash('sha256', $dataStudentExits['nama_siswa'])) {
+        $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudentExits['nama_siswa'], 'nis' => $dataStudentExits['nis']];
+    }
+}
+
+$username = $_SESSION['userLogin']['username'] ?? false;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,7 +49,20 @@
                     </li>
                 </ul>
             </div>
-            <a href="login.php" class="btn btn-primary">Login</a>
+            <?php if ($username) : ?>
+                <!-- Example split danger button -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary"><?php echo $username ?></button>
+                    <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                    </ul>
+                </div>
+            <?php else : ?>
+                <a href="login.php" class="btn btn-primary">Login</a>
+            <?php endif ?>
         </div>
     </nav>
     <!-- end navbar -->
@@ -57,7 +85,7 @@
     </div>
     <!-- end content -->
     <!-- source bootstrap js -->
-    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

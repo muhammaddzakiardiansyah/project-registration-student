@@ -1,17 +1,39 @@
-<?php 
+<?php
+session_start();
 
 require './functions.php';
 
-if(!empty($_POST)) {
-    if(addStudent($_POST) > 0) {
+if (isset($_COOKIE['key']) && isset($_COOKIE['id'])) {
+    $dataStudentExits = getDetailStudent($_COOKIE['id']);
+    if ($_COOKIE['key'] === hash('sha256', $dataStudentExits['nama_siswa'])) {
+        $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudentExits['nama_siswa'], 'nis' => $dataStudentExits['nis']];
+    }
+}
+if (isset($_SESSION['userLogin'])) {
+    header('Location: datapendaftar.php');
+}
+
+if (!empty($_POST)) {
+    $namaSiswa = $_POST['nama_siswa'];
+    $nis = $_POST['nis'];
+
+    $dataStudent = getStudentByStudentName($namaSiswa);
+    if ($dataStudent === null) {
         echo "<script>
-                alert('Selamat anda berhasil mendaftar!'); 
-                document.location.href = 'datapendaftar.php';  
-             </script>";
+                alert('Nama siswa tidak ditemukan.')
+              </script>";
     } else {
-        echo "<script>
-                alert('Maaf anda gagal mendaftar!')
-             </script>";
+        $password = $dataStudent['password'];
+        if (password_verify($nis, $password)) {
+            $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudent['nama_siswa'], 'nis' => $dataStudent['nis']];
+            setcookie('id', $dataStudent['id'], time() + 86400);
+            setcookie('key', hash('sha256', $dataStudent['nama_siswa']), time() + 86400);
+            header('Location: datapendaftar.php');
+        } else {
+            echo "<script>
+                    alert('Password Salah.')
+                  </script>";
+        }
     }
 }
 
@@ -55,11 +77,11 @@ if(!empty($_POST)) {
                     <form action="" method="post">
                         <div class="mb-3">
                             <label for="nama_siswa" class="form-label">Nama Siswa <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Nama Lengkap" name="nama_siswa" class="form-control" id="nama_siswa" required>
+                            <input type="text" placeholder="Masukan Nama Siswa" name="nama_siswa" class="form-control" id="nama_siswa" autocomplete="off" required>
                         </div>
                         <div class="mb-3">
-                            <label for="asal_sekolah" class="form-label">NIS <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Masukan NIS" name="asal_sekolah" class="form-control" id="asal_sekolah" required>
+                            <label for="nis" class="form-label">NIS <span class="text-danger">*</span></label>
+                            <input type="password" placeholder="Masukan NIS" name="nis" class="form-control" id="nis" autocomplete="off" required>
                         </div>
                         <button type="submit" class="btn btn-primary mt-4">Login</button>
                     </form>

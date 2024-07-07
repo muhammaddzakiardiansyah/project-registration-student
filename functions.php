@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 $connection = mysqli_connect('localhost', 'root', '', 'students_collection');
 
 if (mysqli_connect_error()) {
     die('Database dont connected');
 }
 
-function getAllStudents()
+function getAllStudents(): array
 {
     global $connection;
     $query = "SELECT * FROM students";
@@ -18,24 +20,53 @@ function getAllStudents()
     return $allData;
 }
 
-// fungsi menambahkan pendaftaran data siswa
-function addStudent(array $data)
+function getStudentByStudentName(string $studentName): array
+{
+    global $connection;
+    $query = "SELECT * FROM students WHERE nama_siswa = '$studentName' LIMIT 1";
+    $result = mysqli_query($connection, $query);
+    return mysqli_fetch_assoc($result);
+}
+
+function getDetailStudent(string $id): array
+{
+    global $connection;
+    $query = "SELECT * FROM students WHERE id = $id LIMIT 1";
+    $result = mysqli_query($connection, $query);
+    return mysqli_fetch_assoc($result);
+}
+
+
+function addStudent(array $dataStudent): int
 {
     global $connection;
 
-    $nama_siswa = htmlspecialchars($data['nama_siswa']);
-    $alamat = htmlspecialchars($data['alamat']);
-    $jenis_kelamin = htmlspecialchars($data['jenis_kelamin']);
-    $agama = htmlspecialchars($data['agama']);
-    $asal_sekolah = htmlspecialchars($data['asal_sekolah']);
+    $nama_siswa = htmlspecialchars($dataStudent['nama_siswa']);
+    $nisn = htmlspecialchars($dataStudent['nisn']);
+    $nis = $dataStudent[0]['nis'];
+    $alamat = htmlspecialchars($dataStudent['alamat']);
+    $jenis_kelamin = htmlspecialchars($dataStudent['jenis_kelamin']);
+    $agama = htmlspecialchars($dataStudent['agama']);
+    $asal_sekolah = htmlspecialchars($dataStudent['asal_sekolah']);
+    $jurusan = htmlspecialchars($dataStudent['jurusan']);
 
-    $query = "INSERT INTO students (nama_siswa, alamat, jenis_kelamin, agama, asal_sekolah) VALUES ('$nama_siswa', '$alamat', '$jenis_kelamin', '$agama', '$asal_sekolah')";
+    $hash = password_hash("$nis", PASSWORD_ARGON2I);
 
-    mysqli_query($connection, $query);
-    return mysqli_affected_rows($connection);
+    // condition nisn exist 
+    $querySelect = "SELECT * FROM students WHERE nisn = $nisn LIMIT 1";
+    $result = mysqli_query($connection, $querySelect);
+    $countStudent = mysqli_fetch_assoc($result);
+    if ($countStudent > 0) {
+        return 200;
+    } else {
+        $queryInsert = "INSERT INTO students (nama_siswa, nisn, nis, alamat, jenis_kelamin, agama, asal_sekolah, jurusan, password) VALUES ('$nama_siswa', '$nisn', '$nis', '$alamat', '$jenis_kelamin', '$agama', '$asal_sekolah', '$jurusan', '$hash')";
+
+        mysqli_query($connection, $queryInsert);
+        return mysqli_affected_rows($connection);
+    }
 }
 
-function deleteStudent(string $id)
+function deleteStudent(string $id): int
 {
     global $connection;
 
