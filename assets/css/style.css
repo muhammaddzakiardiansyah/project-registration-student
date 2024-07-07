@@ -50,7 +50,7 @@
 
 .nav-item {
     font-weight: 600;
-    margin: 0 15px;
+    margin: 0 20px;
     transition: all .3s ease;
     -webkit-transition: all .3s ease;
     -moz-transition: all .3s ease;
@@ -92,6 +92,7 @@
     height: 60px;
     line-height: 60px;
 }
+
 
 @media only screen and (max-width: 1000px) {
     .section .section-text {

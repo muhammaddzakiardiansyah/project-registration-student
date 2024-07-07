@@ -1,9 +1,20 @@
-<?php 
+<?php
+session_start();
 
 require './functions.php';
 
+if (isset($_COOKIE['key']) && isset($_COOKIE['id'])) {
+    $dataStudentExits = getDetailStudent($_COOKIE['id']);
+    if ($_COOKIE['key'] === hash('sha256', $dataStudentExits['nama_siswa'])) {
+        $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudentExits['nama_siswa'], 'nis' => $dataStudentExits['nis']];
+    }
+}
+
 $students = getAllStudents();
 
+$login = $_SESSION['userLogin']['login'] ?? false;
+$nis = $_SESSION['userLogin']['nis'] ?? '';
+$username = $_SESSION['userLogin']['username'] ?? false;
 ?>
 
 
@@ -42,8 +53,21 @@ $students = getAllStudents();
                         <a class="nav-link text-white" href="jurusan.php">Jurusan</a>
                     </li>
                 </ul>
+                <?php if ($username) : ?>
+                    <!-- Example split danger button -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary"><?php echo $username ?></button>
+                        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="visually-hidden">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                <?php else : ?>
+                    <a href="login.php" class="btn btn-primary">Login</a>
+                <?php endif ?>
             </div>
-            <a href="login.php" class="btn btn-primary">Login</a>
         </div>
     </nav>
     <!-- end navbar -->
@@ -52,26 +76,33 @@ $students = getAllStudents();
         <h2 class="mt-5 fw-bold">Data pendaftar di SMK Syafi'i Akrom</h2>
         <div class="table-responsiv">
             <table class="table table-hover mt-4">
-                <thead class="table-dark">
+                <thead>
                     <tr>
                         <th scope="col">NO.</th>
-                        <th scope="col">NIS</th>
+                        <th scope="col">NISN</th>
                         <th scope="col">Nama Siswa</th>
                         <th scope="col">Jenis Kelamin</th>
                         <th scope="col">Asal Sekolah</th>
+                        <th scope="col">Jurusan</th>
                         <th scope="col">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $i = 1; foreach($students as $student) : ?>
+                    <?php $i = 1;
+                    foreach ($students as $student) : ?>
                         <tr>
-                            <th scope="row"><?php echo $i++ ?></th>
-                            <th>214567</th>
-                            <td><?php echo $student['nama_siswa'] ?></td>
-                            <td><?php echo $student['jenis_kelamin'] ?></td>
-                            <td><?php echo $student['asal_sekolah'] ?></td>
+                            <th scope="row"><?php echo $i++; ?></th>
+                            <th><?php echo $student['nisn']; ?></th>
+                            <td><?php echo $student['nama_siswa']; ?></td>
+                            <td><?php echo $student['jenis_kelamin']; ?></td>
+                            <td><?php echo $student['asal_sekolah']; ?></td>
+                            <td><?php echo $student['jurusan']; ?></td>
                             <td>
-                                <a href="detailpendaftar.php" class="btn btn-sm btn-info">Detail</a> <a href="editdatasiswa.php" class="btn btn-sm btn-warning">Edit</a> <a onclick="return confirm('Yakin ingin menghapus?')" href="hapus.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-danger">Hapus</a>
+                                <?php if ($login === true && $nis == $student['nis']) : ?>
+                                    <a href="detailpendaftar.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-info">Detail</a> <a href="editdatasiswa.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-warning">Edit</a> <a onclick="return confirm('Yakin ingin menghapus?')" href="hapus.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-danger">Hapus</a>
+                                <?php else : ?>
+                                    <a href="detailpendaftar.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-info disabled">Detail</a> <a href="editdatasiswa.php" class="btn btn-sm btn-warning disabled">Edit</a> <a onclick="return confirm('Yakin ingin menghapus?')" href="hapus.php?id=<?php echo $student['id'] ?>" class="btn btn-sm btn-danger disabled">Hapus</a>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -85,7 +116,7 @@ $students = getAllStudents();
     </div>
     <!-- end content -->
     <!-- source bootstrap js -->
-    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -3,20 +3,29 @@
 require './functions.php';
 
 if(!empty($_POST)) {
-    if(addStudent($_POST) > 0) {
+    $_POST[] = ['nis' => rand(1, 100000)];
+    $_POST[] = $_POST;
+    $addStudent = addStudent($_POST);
+    if($addStudent === 1) {
+        $nis = $_POST[0]['nis'];
         echo "<script>
                 alert('Selamat anda berhasil mendaftar!'); 
+                alert('Copy nis ada : $nis untuk login.'); 
+                document.location.href = 'datapendaftar.php';  
+             </script>";
+    } else if($addStudent === 200) {
+        echo "<script>
+                alert('Maaf NISN anda sudah digunakan untuk mendaftar.')
                 document.location.href = 'datapendaftar.php';  
              </script>";
     } else {
         echo "<script>
-                alert('Maaf anda gagal mendaftar!')
+                alert('Maaf anda gagal mendaftar.')
              </script>";
     }
 }
 
 ?>
-
 
 
 
@@ -58,6 +67,10 @@ if(!empty($_POST)) {
                             <input type="text" placeholder="Nama Lengkap" name="nama_siswa" class="form-control" id="nama_siswa" required>
                         </div>
                         <div class="mb-3">
+                            <label for="nisn" class="form-label">NISN <span class="text-danger">*</span></label>
+                            <input type="number" placeholder="NISN" name="nisn" class="form-control" id="nisn" required>
+                        </div>
+                        <div class="mb-3">
                             <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
                             <textarea name="alamat" placeholder="Alamat Lengkap" id="alamat" class="form-control" rows="5" required></textarea>
                         </div>
@@ -95,8 +108,8 @@ if(!empty($_POST)) {
                             <input type="text" name="asal_sekolah" class="form-control" id="asal_sekolah" required>
                         </div>
                         <div class="mb-3">
-                            <label for="agama" class="form-label">Jurusan <span class="text-danger">*</span></label>
-                            <select class="form-select" id="agama" name="agama" aria-label="Default select example" required>
+                            <label for="jurusan" class="form-label">Jurusan <span class="text-danger">*</span></label>
+                            <select class="form-select" id="jurusan" name="jurusan" aria-label="Default select example" required>
                                 <option selected>Pilih Jurusan</option>
                                 <option value="Teknik Kendaraan Ringan Otomotif">Teknik Kendaraan Ringan Otomotif (TKRO)</option>
                                 <option value="Teknik Bisnis Sepeda Motor">Teknik Bisnis Sepeda Motor (TBSM)</option>

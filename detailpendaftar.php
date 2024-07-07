@@ -2,6 +2,9 @@
 
 require './functions.php';
 
+$id = $_GET['id'] ?? 0;
+$student = getDetailStudent($id);
+
 ?>
 
 
@@ -42,27 +45,27 @@ require './functions.php';
                     <table class="table">
                       <tr>
                         <td>Nama Siswa</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['nama_siswa'] ?></td>
                       </tr>
                       <tr>
                         <td>Alamat</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['alamat'] ?></td>
                       </tr>
                       <tr>
                         <td>Jenis Kelamin</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['jenis_kelamin'] ?></td>
                       </tr>
                       <tr>
                         <td>Agama</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['agama'] ?></td>
                       </tr>
                       <tr>
                         <td>Asal Sekolah</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['asal_sekolah'] ?></td>
                       </tr>
                       <tr>
                         <td>Jurusan yang diambil</td>
-                        <td>Mamad</td>
+                        <td><?php echo $student['jurusan'] ?></td>
                       </tr>
                     </table>
                 </div>
