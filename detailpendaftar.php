@@ -30,9 +30,6 @@ $student = getDetailStudent($id);
     <nav class="navbar navbar-expand-lg bg-sc-primary">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" href="index.php">Detail siswa pendaftar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
         </div>
     </nav>
     <!-- end navbar -->
@@ -46,6 +43,14 @@ $student = getDetailStudent($id);
                       <tr>
                         <td>Nama Siswa</td>
                         <td><?php echo $student['nama_siswa'] ?></td>
+                      </tr>
+                      <tr>
+                        <td>NISN</td>
+                        <td><?php echo $student['nisn'] ?></td>
+                      </tr>
+                      <tr>
+                        <td>NIS</td>
+                        <td><?php echo $student['nis'] ?></td>
                       </tr>
                       <tr>
                         <td>Alamat</td>

@@ -1,17 +1,41 @@
-<?php 
+<?php
+session_start();
 
 require './functions.php';
 
-if(!empty($_POST)) {
-    if(addStudent($_POST) > 0) {
-        echo "<script>
-                alert('Selamat anda berhasil mendaftar!'); 
-                document.location.href = 'datapendaftar.php';  
-             </script>";
+if(!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+}
+
+$id = $_GET['id'] ?? '';
+
+$dataStudent = getDetailStudent($id);
+
+if (!empty($_POST)) {
+    $csrfTokenInSession = $_SESSION['csrf_token'] ?? [];
+    $csrfTokenOnForm = $_POST['csrf_token'] ?? '';
+    if($csrfTokenOnForm == $csrfTokenInSession) {
+        unset($_SESSION['csrf_token']);
+        $editStudent = editStudent($_POST, $id);
+        echo $editStudent;
+        if ($editStudent === 1) {
+            echo "<script>
+                    alert('Berhasil mengedit!'); 
+                    document.location.href = 'datapendaftar.php';  
+                 </script>";
+        } else if ($editStudent === 200) {
+            echo "<script>
+                    alert('Maaf nisn anda sudah terdaftar.')
+                 </script>";
+        } else {
+            echo "<script>
+                    alert('Maaf anda gagal mengedit!')
+                 </script>";
+        }
     } else {
         echo "<script>
-                alert('Maaf anda gagal mendaftar!')
-             </script>";
+                    alert('Maaf anda gagal mengedit.')
+                 </script>";
     }
 }
 
@@ -40,9 +64,6 @@ if(!empty($_POST)) {
     <nav class="navbar navbar-expand-lg bg-sc-primary">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" href="index.php">Edit data siswa</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
         </div>
     </nav>
     <!-- end navbar -->
@@ -53,25 +74,30 @@ if(!empty($_POST)) {
                 <div class="card p-5">
                     <h2 class="fw-bold mb-5">Edit data siswa</h2>
                     <form action="" method="post">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?>">
                         <div class="mb-3">
                             <label for="nama_siswa" class="form-label">Nama Siswa <span class="text-danger">*</span></label>
-                            <input type="text" placeholder="Nama Lengkap" name="nama_siswa" class="form-control" id="nama_siswa" required>
+                            <input type="text" placeholder="Nama Lengkap" name="nama_siswa" class="form-control" id="nama_siswa" value="<?php echo $dataStudent['nama_siswa'] ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nisn" class="form-label">NISN <span class="text-danger">*</span></label>
+                            <input type="number" placeholder="NISN" name="nisn" class="form-control" id="nisn" value="<?php echo $dataStudent['nisn'] ?>" required>
                         </div>
                         <div class="mb-3">
                             <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
-                            <textarea name="alamat" placeholder="Alamat Lengkap" id="alamat" class="form-control" rows="5" required></textarea>
+                            <textarea name="alamat" placeholder="Alamat Lengkap" id="alamat" class="form-control" rows="5" required><?php echo $dataStudent['alamat'] ?></textarea>
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="jenis_kelamin">Jenis kelamin <span class="text-danger">*</span></label>
                             <div class="d-flex gap-3 mx-4">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="jenis_kelamin" id="laki_laki" value="Laki laki">
+                                    <input class="form-check-input" type="radio" name="jenis_kelamin" id="laki_laki" value="Laki laki" <?php echo $dataStudent['jenis_kelamin'] == 'Laki laki' ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="laki_laki">
                                         Laki laki
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="jenis_kelamin" id="perempuan" value="Perempuan">
+                                    <input class="form-check-input" type="radio" name="jenis_kelamin" id="perempuan" value="Perempuan" <?php echo $dataStudent['jenis_kelamin'] == 'Perempuan' ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="perempuan">
                                         Perempuan
                                     </label>
@@ -82,27 +108,27 @@ if(!empty($_POST)) {
                             <label for="agama" class="form-label">Agama <span class="text-danger">*</span></label>
                             <select class="form-select" id="agama" name="agama" aria-label="Default select example" required>
                                 <option selected>Pilih agama</option>
-                                <option value="Islam">Islam</option>
-                                <option value="Katolik">Katolik</option>
-                                <option value="Protestan">Protestan</option>
-                                <option value="Hindu">Hindu</option>
-                                <option value="Buddha">Buddha</option>
-                                <option value="Konghucu">Konghucu</option>
+                                <option value="Islam" <?php echo $dataStudent['agama'] == 'Islam' ? 'selected' : '' ?>>Islam</option>
+                                <option value="Katolik" <?php echo $dataStudent['agama'] == 'Katolik' ? 'selected' : '' ?>>Katolik</option>
+                                <option value="Protestan" <?php echo $dataStudent['agama'] == 'Protestan' ? 'selected' : '' ?>>Protestan</option>
+                                <option value="Hindu" <?php echo $dataStudent['agama'] == 'Hindu' ? 'selected' : '' ?>>Hindu</option>
+                                <option value="Buddha" <?php echo $dataStudent['agama'] == 'Buddha' ? 'selected' : '' ?>>Buddha</option>
+                                <option value="Konghucu" <?php echo $dataStudent['agama'] == 'Konghucu' ? 'selected' : '' ?>>Konghucu</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="asal_sekolah" class="form-label">Asal Sekolah <span class="text-danger">*</span></label>
-                            <input type="text" name="asal_sekolah" class="form-control" id="asal_sekolah" required>
+                            <input type="text" value="<?php echo $dataStudent['asal_sekolah'] ?>" name="asal_sekolah" class="form-control" id="asal_sekolah" required>
                         </div>
                         <div class="mb-3">
-                            <label for="agama" class="form-label">Jurusan <span class="text-danger">*</span></label>
-                            <select class="form-select" id="agama" name="agama" aria-label="Default select example" required>
+                            <label for="jurusan" class="form-label">Jurusan <span class="text-danger">*</span></label>
+                            <select class="form-select" id="jurusan" name="jurusan" aria-label="Default select example" required>
                                 <option selected>Pilih Jurusan</option>
-                                <option value="Teknik Kendaraan Ringan Otomotif">Teknik Kendaraan Ringan Otomotif (TKRO)</option>
-                                <option value="Teknik Bisnis Sepeda Motor">Teknik Bisnis Sepeda Motor (TBSM)</option>
-                                <option value="Pengembangan Perangkat Lunak & Gim">Pengembangan Perangkat Lunak & Gim (PPLG)</option>
-                                <option value="Teknik Jaringan Komputer & Telekomunikasi">Teknik Jaringan Komputer & Telekomunikasi (TJKT)</option>
-                                <option value="Busana Butik">Busana Butik (BB)</option>
+                                <option value="Teknik Kendaraan Ringan Otomotif" <?php echo $dataStudent['jurusan'] == 'Teknik Kendaraan Ringan Otomotif' ? 'selected' : '' ?>>Teknik Kendaraan Ringan Otomotif (TKRO)</option>
+                                <option value="Teknik Bisnis Sepeda Motor" <?php echo $dataStudent['jurusan'] == 'Teknik Bisnis Sepeda Motor' ? 'selected' : '' ?>>Teknik Bisnis Sepeda Motor (TBSM)</option>
+                                <option value="Pengembangan Perangkat Lunak & Gim" <?php echo $dataStudent['jurusan'] == 'Pengembangan Perangkat Lunak & Gim' ? 'selected' : '' ?>>Pengembangan Perangkat Lunak & Gim (PPLG)</option>
+                                <option value="Teknik Jaringan Komputer & Telekomunikasi" <?php echo $dataStudent['jurusan'] == 'Teknik Jaringan Komputer & Telekomunikasi' ? 'selected' : '' ?>>Teknik Jaringan Komputer & Telekomunikasi (TJKT)</option>
+                                <option value="Busana Butik" <?php echo $dataStudent['jurusan'] == 'Busana Butik' ? 'selected' : '' ?>>Busana Butik (BB)</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary mt-4">Simpan Perubahan</button>

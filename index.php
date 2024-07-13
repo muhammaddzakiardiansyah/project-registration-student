@@ -48,8 +48,7 @@ $username = $_SESSION['userLogin']['username'] ?? false;
                         <a class="nav-link text-white" href="jurusan.php">Jurusan</a>
                     </li>
                 </ul>
-            </div>
-            <?php if ($username) : ?>
+                <?php if ($username) : ?>
                 <!-- Example split danger button -->
                 <div class="btn-group">
                     <button type="button" class="btn btn-primary"><?php echo $username ?></button>
@@ -57,12 +56,13 @@ $username = $_SESSION['userLogin']['username'] ?? false;
                         <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                     </ul>
                 </div>
             <?php else : ?>
                 <a href="login.php" class="btn btn-primary">Login</a>
             <?php endif ?>
+            </div>
         </div>
     </nav>
     <!-- end navbar -->

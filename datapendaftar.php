@@ -61,7 +61,7 @@ $username = $_SESSION['userLogin']['username'] ?? false;
                             <span class="visually-hidden">Toggle Dropdown</span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                            <li><a class="dropdown-item" onclick="return confirm('Yakin ingin Logout?')" href="logout.php">Logout</a></li>
                         </ul>
                     </div>
                 <?php else : ?>
@@ -79,7 +79,6 @@ $username = $_SESSION['userLogin']['username'] ?? false;
                 <thead>
                     <tr>
                         <th scope="col">NO.</th>
-                        <th scope="col">NISN</th>
                         <th scope="col">Nama Siswa</th>
                         <th scope="col">Jenis Kelamin</th>
                         <th scope="col">Asal Sekolah</th>
@@ -92,7 +91,6 @@ $username = $_SESSION['userLogin']['username'] ?? false;
                     foreach ($students as $student) : ?>
                         <tr>
                             <th scope="row"><?php echo $i++; ?></th>
-                            <th><?php echo $student['nisn']; ?></th>
                             <td><?php echo $student['nama_siswa']; ?></td>
                             <td><?php echo $student['jenis_kelamin']; ?></td>
                             <td><?php echo $student['asal_sekolah']; ?></td>
@@ -113,6 +111,7 @@ $username = $_SESSION['userLogin']['username'] ?? false;
             </table>
         </div>
         <a href="index.php" class="btn btn-primary mt-5">Kembali ke home</a>
+        <div class="mb-5"></div>
     </div>
     <!-- end content -->
     <!-- source bootstrap js -->

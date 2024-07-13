@@ -1,23 +1,38 @@
-<?php 
-
+<?php
+session_start();
+ 
 require './functions.php';
 
-if(!empty($_POST)) {
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+}
+
+if (!empty($_POST)) {
     $_POST[] = ['nis' => rand(1, 100000)];
     $_POST[] = $_POST;
-    $addStudent = addStudent($_POST);
-    if($addStudent === 1) {
-        $nis = $_POST[0]['nis'];
-        echo "<script>
+    $csrfTokenInSession = $_SESSION['csrf_token'] ?? '';
+    $csrfTokenOnInput = $_POST['csrf_token'] ?? '';
+    if ($csrfTokenInSession === $csrfTokenOnInput) {
+        session_unset();
+        session_destroy();
+        $addStudent = addStudent($_POST);
+        if ($addStudent === 1) {
+            $nis = $_POST[0]['nis'];
+            echo "<script>
                 alert('Selamat anda berhasil mendaftar!'); 
-                alert('Copy nis ada : $nis untuk login.'); 
+                alert('Copy nis anda : $nis untuk login.'); 
                 document.location.href = 'datapendaftar.php';  
              </script>";
-    } else if($addStudent === 200) {
-        echo "<script>
+        } else if ($addStudent === 200) {
+            echo "<script>
                 alert('Maaf NISN anda sudah digunakan untuk mendaftar.')
                 document.location.href = 'datapendaftar.php';  
              </script>";
+        } else {
+            echo "<script>
+                alert('Maaf anda gagal mendaftar.')
+             </script>";
+        }
     } else {
         echo "<script>
                 alert('Maaf anda gagal mendaftar.')
@@ -49,9 +64,6 @@ if(!empty($_POST)) {
     <nav class="navbar navbar-expand-lg bg-sc-primary">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" href="index.php">Form pendaftaran siswa baru</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
         </div>
     </nav>
     <!-- end navbar -->
@@ -62,6 +74,7 @@ if(!empty($_POST)) {
                 <div class="card p-5">
                     <h2 class="fw-bold mb-5">Form pendaftaran</h2>
                     <form action="" method="post">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                         <div class="mb-3">
                             <label for="nama_siswa" class="form-label">Nama Siswa <span class="text-danger">*</span></label>
                             <input type="text" placeholder="Nama Lengkap" name="nama_siswa" class="form-control" id="nama_siswa" required>
