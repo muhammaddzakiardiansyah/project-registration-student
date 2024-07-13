@@ -17,7 +17,7 @@ function getAllStudents(): array
     while ($data = mysqli_fetch_assoc($result)) {
         $allData[] = $data;
     }
-    return $allData;
+    return $allData ?? [];
 }
 
 function getStudentByStudentName(string $studentName): array
@@ -25,7 +25,7 @@ function getStudentByStudentName(string $studentName): array
     global $connection;
     $query = "SELECT * FROM students WHERE nama_siswa = '$studentName' LIMIT 1";
     $result = mysqli_query($connection, $query);
-    return mysqli_fetch_assoc($result);
+    return mysqli_fetch_assoc($result) ?? [];
 }
 
 function getDetailStudent(string $id): array
@@ -33,7 +33,7 @@ function getDetailStudent(string $id): array
     global $connection;
     $query = "SELECT * FROM students WHERE id = $id LIMIT 1";
     $result = mysqli_query($connection, $query);
-    return mysqli_fetch_assoc($result);
+    return mysqli_fetch_assoc($result) ?? [];
 }
 
 
@@ -48,7 +48,7 @@ function addStudent(array $dataStudent): int
     $jenis_kelamin = htmlspecialchars($dataStudent['jenis_kelamin']);
     $agama = htmlspecialchars($dataStudent['agama']);
     $asal_sekolah = htmlspecialchars($dataStudent['asal_sekolah']);
-    $jurusan = htmlspecialchars($dataStudent['jurusan']);
+    $jurusan = $dataStudent['jurusan'];
 
     $hash = password_hash("$nis", PASSWORD_ARGON2I);
 
@@ -62,6 +62,38 @@ function addStudent(array $dataStudent): int
         $queryInsert = "INSERT INTO students (nama_siswa, nisn, nis, alamat, jenis_kelamin, agama, asal_sekolah, jurusan, password) VALUES ('$nama_siswa', '$nisn', '$nis', '$alamat', '$jenis_kelamin', '$agama', '$asal_sekolah', '$jurusan', '$hash')";
 
         mysqli_query($connection, $queryInsert);
+        return mysqli_affected_rows($connection);
+    }
+}
+
+function editStudent(array $dataStudent, string $id): int
+{
+    global $connection;
+
+    $nama_siswa = htmlspecialchars($dataStudent['nama_siswa']);
+    $nisn = htmlspecialchars($dataStudent['nisn']);
+    $alamat = htmlspecialchars($dataStudent['alamat']);
+    $jenis_kelamin = htmlspecialchars($dataStudent['jenis_kelamin']);
+    $agama = htmlspecialchars($dataStudent['agama']);
+    $asal_sekolah = htmlspecialchars($dataStudent['asal_sekolah']);
+    $jurusan = $dataStudent['jurusan'];
+
+    // condition nisn exist 
+    $querySelect = "SELECT * FROM students WHERE nama_siswa = '$nama_siswa' LIMIT 1";
+    $result = mysqli_query($connection, $querySelect);
+    $countStudent = mysqli_fetch_assoc($result);
+    if ($countStudent > 0) {
+        if ($countStudent['nama_siswa'] == $nama_siswa) {
+            $queryUpdate = "UPDATE students SET nama_siswa='$nama_siswa', nisn='$nisn', alamat='$alamat', jenis_kelamin='$jenis_kelamin', agama='$agama', asal_sekolah='$asal_sekolah', jurusan='$jurusan'";
+
+            mysqli_query($connection, $queryUpdate);
+            return mysqli_affected_rows($connection);
+        }
+        return 200;
+    } else {
+        $queryUpdate = "UPDATE students SET nama_siswa='$nama_siswa', nisn='$nisn', alamat='$alamat', jenis_kelamin='$jenis_kelamin', agama='$agama', asal_sekolah='$asal_sekolah', jurusan='$jurusan' WHERE id = $id";
+
+        mysqli_query($connection, $queryUpdate);
         return mysqli_affected_rows($connection);
     }
 }

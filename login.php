@@ -13,27 +13,44 @@ if (isset($_SESSION['userLogin'])) {
     header('Location: datapendaftar.php');
 }
 
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+}
+
+
 if (!empty($_POST)) {
     $namaSiswa = $_POST['nama_siswa'];
     $nis = $_POST['nis'];
-
-    $dataStudent = getStudentByStudentName($namaSiswa);
-    if ($dataStudent === null) {
-        echo "<script>
-                alert('Nama siswa tidak ditemukan.')
-              </script>";
-    } else {
-        $password = $dataStudent['password'];
-        if (password_verify($nis, $password)) {
-            $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudent['nama_siswa'], 'nis' => $dataStudent['nis']];
-            setcookie('id', $dataStudent['id'], time() + 86400);
-            setcookie('key', hash('sha256', $dataStudent['nama_siswa']), time() + 86400);
-            header('Location: datapendaftar.php');
-        } else {
+    $csrfTokenInSession = $_SESSION['csrf_token'] ?? '';
+    $csrfTokenOnInput = $_POST['csrf_token'] ?? '';
+    if ($csrfTokenInSession === $csrfTokenOnInput) {
+        session_unset();
+        session_destroy();
+        $dataStudent = getStudentByStudentName($namaSiswa);
+        if ($dataStudent === []) {
+            $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
             echo "<script>
-                    alert('Password Salah.')
+                    alert('Nama siswa tidak ditemukan.')
                   </script>";
+        } else {
+            $password = $dataStudent['password'] ?? '';
+            if (password_verify($nis, $password)) {
+                $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+                $_SESSION['userLogin'] = ['login' => true, 'username' => $dataStudent['nama_siswa'], 'nis' => $dataStudent['nis']];
+                setcookie('id', $dataStudent['id'], time() + 86400);
+                setcookie('key', hash('sha256', $dataStudent['nama_siswa']), time() + 86400);
+                header('Location: datapendaftar.php');
+            } else {
+                $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+                echo "<script>
+                        alert('Password Salah.')
+                      </script>";
+            }
         }
+    } else {
+        echo "<script>
+                    alert('Gagal login.')
+              </script>";
     }
 }
 
@@ -62,9 +79,6 @@ if (!empty($_POST)) {
     <nav class="navbar navbar-expand-lg bg-sc-primary">
         <div class="container">
             <a class="navbar-brand text-white fw-bold" href="index.php">SMK Syafi'i Akrom</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
         </div>
     </nav>
     <!-- end navbar -->
@@ -75,6 +89,7 @@ if (!empty($_POST)) {
                 <div class="card p-5">
                     <h2 class="fw-bold mb-5">Login</h2>
                     <form action="" method="post">
+                        <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token'] ?>">
                         <div class="mb-3">
                             <label for="nama_siswa" class="form-label">Nama Siswa <span class="text-danger">*</span></label>
                             <input type="text" placeholder="Masukan Nama Siswa" name="nama_siswa" class="form-control" id="nama_siswa" autocomplete="off" required>
