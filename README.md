@@ -11,6 +11,7 @@ Learn build website to registration student👨‍🎓
 
  - HTML 5
  - CSS 3
+ - Maria DB 10.4
  - Bootstrap 5
  - PHP 8
 
